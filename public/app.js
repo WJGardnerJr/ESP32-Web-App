@@ -18,17 +18,25 @@ function refresh() {
     console.log('Error loading photo:', error);
   });
 }
-
 function clearFirestore() {
-    const directoryRef = storage.ref('data/');
-
-    directoryRef.listAll().then((result) => {
-        result.items.forEach((fileRef) => {
-            deleteFile(directoryRef, fileRef.name);
+    // Display confirmation dialog
+    if (confirm("Are you sure you want to clear Firestore? This action cannot be undone.")) {
+        const collectionRef = firestore.collection('yourCollectionName');
+        collectionRef.get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                collectionRef.doc(doc.id).delete().then(() => {
+                    console.log("Document successfully deleted!");
+                }).catch((error) => {
+                    console.error("Error removing document: ", error);
+                });
+            });
+        }).catch((error) => {
+            console.error("Error getting documents: ", error);
         });
-    }).catch((error) => {
-        console.log('Error listing files:', error);
-    });
+    } else {
+        // User clicked "No", do nothing
+        console.log("Clear action canceled by user.");
+    }
 }
 
 function deleteFile(directoryRef, fileName) {
