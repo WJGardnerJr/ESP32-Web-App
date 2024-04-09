@@ -17,6 +17,7 @@ function refresh() {
   }).catch(error => {
     console.log('Error loading photo:', error);
   });
+  window.location.reload();
 }
 function clearFirestore() {
     // Display confirmation dialog
@@ -33,6 +34,7 @@ function clearFirestore() {
         }).catch((error) => {
             console.error("Error getting documents: ", error);
         });
+    window.location.reload();
     } else {
         // User clicked "No", do nothing
         console.log("Clear action canceled by user.");
