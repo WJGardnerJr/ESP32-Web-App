@@ -57,7 +57,6 @@ function updatePhotoList() {
     totalPhotos = photoNames.length;
     if (photoNames.length > 0) {
       refresh(); // Refresh to display the first photo
-      window.location.reload();
     }
   });
 }
