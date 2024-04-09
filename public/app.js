@@ -19,31 +19,31 @@ function refresh() {
   });
   window.location.reload();
 }
-function clearFirestore() {
-    // Display confirmation dialog
-    if (confirm("Are you sure you want to clear Firestore? This action cannot be undone.")) {
-      var storageRef = firebase.storage().ref();
-      storageRef.listAll().then(result => {
-          // Check if there are files to delete
-          if (result.items.length > 0) {
+
+function clearStorage() {
+  var storageRef = firebase.storage().ref();
+  storageRef.listAll().then(result => {
+      if (result.items.length > 0) {
+          // Only show confirmation if there are files to delete
+          if (confirm("Are you sure you want to clear Storage? This action cannot be undone.")) {
               let deletePromises = result.items.map(itemRef => itemRef.delete());
-  
+
               // Wait for all delete operations to complete
               Promise.all(deletePromises).then(() => {
                   console.log('All files deleted');
-                  // Only reload the page if there were files and they have been deleted
+                  // Reload the page after successful deletion
                   window.location.reload();
               }).catch(error => {
                   console.error("Error deleting files: ", error);
               });
-          } else {
-              console.log('No files to delete in Storage');
-              // Do not reload the page if there were no files to delete
           }
-      }).catch(error => {
-          console.error("Error listing files in Storage: ", error);
-      });
-  }
+      } else {
+          console.log('No files to delete in Storage');
+          // Do not reload the page if there were no files to delete
+      }
+  }).catch(error => {
+      console.error("Error listing files in Storage: ", error);
+  });
 }
 
 function deleteFile(directoryRef, fileName) {
