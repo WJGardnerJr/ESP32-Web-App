@@ -24,22 +24,24 @@ function clearStorage() {
   var storageRef = firebase.storage().ref();
   storageRef.listAll().then(result => {
       if (result.items.length > 0) {
-          // Only show confirmation if there are files to delete
           if (confirm("Are you sure you want to clear Storage? This action cannot be undone.")) {
               let deletePromises = result.items.map(itemRef => itemRef.delete());
-
-              // Wait for all delete operations to complete
-              Promise.all(deletePromises).then(() => {
-                  console.log('All files deleted');
-                  // Reload the page after successful deletion
-                  window.location.reload();
-              }).catch(error => {
-                  console.error("Error deleting files: ", error);
-              });
+              Promise.all(deletePromises)
+                  .then(() => {
+                      console.log('All files deleted');
+                      // Set a flag or session/local storage item to check if reload is needed
+                      sessionStorage.setItem('reloadNeeded', 'true');
+                      // Conditionally reload based on action taken
+                      if (sessionStorage.getItem('reloadNeeded') === 'true') {
+                          window.location.reload();
+                      }
+                  })
+                  .catch(error => {
+                      console.error("Error deleting files: ", error);
+                  });
           }
       } else {
           console.log('No files to delete in Storage');
-          // Do not reload the page if there were no files to delete
       }
   }).catch(error => {
       console.error("Error listing files in Storage: ", error);
@@ -63,6 +65,9 @@ function updatePhotoList() {
     if (photoNames.length > 0) {
       refresh(); // Refresh to display the first photo
     }
+    if (photoNames.length === 0) {
+      console.log('No photos found in Storage');
+    }
   });
 }
 
@@ -82,3 +87,8 @@ document.getElementById('previous').addEventListener('click', () => {
 
 // Initialize
 updatePhotoList();
+
+// Clear the session storage flag on page load to prevent auto-reloading
+window.onload = () => {
+  sessionStorage.removeItem('reloadNeeded');
+};
