@@ -37,7 +37,6 @@
 
 </script>
 <script src="app.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 </head>
 <body>
@@ -53,6 +52,6 @@
     <p>Current photo: <span id="filename">Loading...</span></p> 
     <p>Last picture taken: <span id="date-time"></span></p>
     <button onclick="refresh();">Refresh</button>
-    <button id="clearFirestore" onclick="clearStorage();">Clear Firebase Storage</button>
+    <button id="clearFirestore" onclick="clearFirestore();">Clear Firestore</button>
   </body>
 </html>

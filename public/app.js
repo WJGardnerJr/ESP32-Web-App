@@ -17,35 +17,26 @@ function refresh() {
   }).catch(error => {
     console.log('Error loading photo:', error);
   });
-  window.location.reload();
 }
-
-function clearStorage() {
-  var storageRef = firebase.storage().ref();
-  storageRef.listAll().then(result => {
-      if (result.items.length > 0) {
-          if (confirm("Are you sure you want to clear Storage? This action cannot be undone.")) {
-              let deletePromises = result.items.map(itemRef => itemRef.delete());
-              Promise.all(deletePromises)
-                  .then(() => {
-                      console.log('All files deleted');
-                      // Set a flag or session/local storage item to check if reload is needed
-                      sessionStorage.setItem('reloadNeeded', 'true');
-                      // Conditionally reload based on action taken
-                      if (sessionStorage.getItem('reloadNeeded') === 'true') {
-                          window.location.reload();
-                      }
-                  })
-                  .catch(error => {
-                      console.error("Error deleting files: ", error);
-                  });
-          }
-      } else {
-          console.log('No files to delete in Storage');
-      }
-  }).catch(error => {
-      console.error("Error listing files in Storage: ", error);
-  });
+function clearFirestore() {
+    // Display confirmation dialog
+    if (confirm("Are you sure you want to clear Firestore? This action cannot be undone.")) {
+        const collectionRef = firestore.collection('yourCollectionName');
+        collectionRef.get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                collectionRef.doc(doc.id).delete().then(() => {
+                    console.log("Document successfully deleted!");
+                }).catch((error) => {
+                    console.error("Error removing document: ", error);
+                });
+            });
+        }).catch((error) => {
+            console.error("Error getting documents: ", error);
+        });
+    } else {
+        // User clicked "No", do nothing
+        console.log("Clear action canceled by user.");
+    }
 }
 
 function deleteFile(directoryRef, fileName) {
@@ -64,9 +55,6 @@ function updatePhotoList() {
     totalPhotos = photoNames.length;
     if (photoNames.length > 0) {
       refresh(); // Refresh to display the first photo
-    }
-    if (photoNames.length === 0) {
-      console.log('No photos found in Storage');
     }
   });
 }
@@ -87,8 +75,3 @@ document.getElementById('previous').addEventListener('click', () => {
 
 // Initialize
 updatePhotoList();
-
-// Clear the session storage flag on page load to prevent auto-reloading
-window.onload = () => {
-  sessionStorage.removeItem('reloadNeeded');
-};
