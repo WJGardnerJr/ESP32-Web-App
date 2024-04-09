@@ -24,22 +24,21 @@ function clearFirestore() {
     if (confirm("Are you sure you want to clear Firestore? This action cannot be undone.")) {
       var storageRef = firebase.storage().ref();
       storageRef.listAll().then(result => {
+          // Check if there are files to delete
           if (result.items.length > 0) {
-              let deletePromises = [];
-              result.items.forEach(itemRef => {
-                  // Add the delete promise to an array
-                  deletePromises.push(itemRef.delete());
-              });
+              let deletePromises = result.items.map(itemRef => itemRef.delete());
   
-              // Wait for all files to be deleted
+              // Wait for all delete operations to complete
               Promise.all(deletePromises).then(() => {
                   console.log('All files deleted');
-                  window.location.reload(); // Reload the page after deleting the files
+                  // Only reload the page if there were files and they have been deleted
+                  window.location.reload();
               }).catch(error => {
                   console.error("Error deleting files: ", error);
               });
           } else {
               console.log('No files to delete in Storage');
+              // Do not reload the page if there were no files to delete
           }
       }).catch(error => {
           console.error("Error listing files in Storage: ", error);
